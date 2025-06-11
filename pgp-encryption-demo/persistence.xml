@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence>
+    <persistence-unit name="remita" transaction-type="JTA">
+        <jta-data-source>java:jboss/datasources/RemitaDB</jta-data-source>
+        <properties>
+            <property name="jboss.as.jpa.providerModule" value="org.hibernate"/>
+            <property name="jboss.entity.manager.factory.jndi.name" value="java:jboss/EntityManagerFactories/remita"/>
+            <property name="jboss.entity.manager.jndi.name" value="java:jboss/EntityManagers/remita"/>
+            <property name="hibernate.transaction.manager_lookup_class"
+                      value="org.hibernate.transaction.JBossTransactionManagerLookup"/>
+            <property name="hibernate.listeners.envers.autoRegister" value="true"/>
+            <property name="jta.UserTransaction" value="java:jboss/UserTransaction"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.Oracle10gDialect"/>
+            <property name="hibernate.hbm2ddl.auto" value="none"/>
+            <property name="hibernate.max_fetch_depth" value="1"/>
+            <property name="hibernate.query.substitutions" value="true 1, false 0"/>
+            <property name="hibernate.cache.region.factory_class"
+                      value="org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory"/>
+            <property name="hibernate.order_updates" value="true"/>
+            <property name="hibernate.cache.use_second_level_cache" value="false"/>
+            <property name="hibernate.cache.use_query_cache" value="false"/>
+            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.default_schema" value="qaremita"/>
+        </properties>
+    </persistence-unit>
+</persistence>
+
+
