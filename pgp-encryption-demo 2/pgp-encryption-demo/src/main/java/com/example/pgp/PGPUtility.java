@@ -12,11 +12,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.security.Security;
-
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
 import org.bouncycastle.openpgp.operator.PBESecretKeyDecryptor;
-
 
 public class PGPUtility {
 
@@ -28,24 +25,21 @@ public class PGPUtility {
         String passphrase = "phrase";
         String jsonData = new String(Files.readAllBytes(Paths.get("C:\\Users\\LAJIDE\\Downloads\\PGP-Test\\PGP-Test\\data.json")), StandardCharsets.UTF_8);
 
-        String publicKeyPath = "C:\\Users\\LAJIDE\\Downloads\\PGP-Test\\PGP-Test\\public.asc";
-        String privateKeyPath = "C:\\Users\\LAJIDE\\Downloads\\PGP-Test\\PGP-Test\\private.asc";
-
-
+        String publicKeyPath = "C:\\Users\\LAJIDE\\Downloads\\PGP-Test\\PGP-Test\\uudara_remita_public.asc";
+        String privateKeyPath = "C:\\Users\\LAJIDE\\Downloads\\PGP-Test\\PGP-Test\\uudara_remita_private.asc";
 
         String decrypted = null;
         if (jsonData.startsWith("{") && jsonData.endsWith("}")) {
             String encrypted = encrypt(jsonData, publicKeyPath);
-            System.out.println("Encrypted:\n" + encrypted);
+            System.out.println("Encrypted:\n" + cleanEncryptedOutput(encrypted));
 
             decrypted = decrypt(encrypted, privateKeyPath, passphrase);
-            System.out.println("Decrypted:\n" + decrypted);
+            System.out.println("Decrypted:\n" + decrypted.replaceAll("\\s+", ""));
         } else {
-            System.out.println("Encrypted jsonData Data:\n" + jsonData);
+            System.out.println("Encrypted jsonData Data:\n" + cleanEncryptedOutput(jsonData));
 
             decrypted = decrypt(jsonData, privateKeyPath, passphrase);
-            System.out.println("Already Decrypted:\n" + decrypted);
-
+            System.out.println("Already Decrypted:\n" + decrypted.replaceAll("\\s+", ""));
         }
     }
 
@@ -145,6 +139,28 @@ public class PGPUtility {
             }
         }
         throw new IllegalArgumentException("No encryption key found in public key ring.");
+    }
+
+    private static String cleanEncryptedOutput(String rawEncryptedText) {
+        StringBuilder sb = new StringBuilder();
+        BufferedReader reader = new BufferedReader(new StringReader(rawEncryptedText));
+        String line;
+        try {
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                // Remove all PGP headers/footers and version lines
+                if (!line.equals("-----BEGIN PGP MESSAGE-----") &&
+                    !line.equals("-----END PGP MESSAGE-----") &&
+                    !line.startsWith("Version:") &&
+                    !line.isEmpty()) {
+                    sb.append(line);
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        // Remove all whitespace from the result
+        return sb.toString().replaceAll("\\s+", "");
     }
 }
 
