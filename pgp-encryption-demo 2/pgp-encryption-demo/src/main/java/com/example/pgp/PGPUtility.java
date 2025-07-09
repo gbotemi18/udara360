@@ -28,19 +28,49 @@ public class PGPUtility {
         String publicKeyPath = "C:\\Users\\LAJIDE\\Downloads\\PGP-Test\\PGP-Test\\uudara_remita_public.asc";
         String privateKeyPath = "C:\\Users\\LAJIDE\\Downloads\\PGP-Test\\PGP-Test\\uudara_remita_private.asc";
 
+        String formatedpayload = validatePayload (jsonData);
+
         String decrypted = null;
-        if (jsonData.startsWith("{") && jsonData.endsWith("}")) {
-            String encrypted = encrypt(jsonData, publicKeyPath);
+        if (formatedpayload.startsWith("{") && formatedpayload.endsWith("}")) {
+            String encrypted = encrypt(formatedpayload, publicKeyPath);
             System.out.println("Encrypted:\n" + cleanEncryptedOutput(encrypted));
 
             decrypted = decrypt(encrypted, privateKeyPath, passphrase);
             System.out.println("Decrypted:\n" + decrypted.replaceAll("\\s+", ""));
         } else {
-            System.out.println("Encrypted jsonData Data:\n" + cleanEncryptedOutput(jsonData));
+            System.out.println("Encrypted formatedpayload Data:\n" + cleanEncryptedOutput(formatedpayload));
 
-            decrypted = decrypt(jsonData, privateKeyPath, passphrase);
+            decrypted = decrypt(formatedpayload, privateKeyPath, passphrase);
             System.out.println("Already Decrypted:\n" + decrypted.replaceAll("\\s+", ""));
         }
+    }
+
+    public  static String validatePayload(String json) {
+        if (json == null || json.trim().isEmpty()) return null;
+
+        String payload = json.trim();
+
+        // Remove outer braces
+        if (payload.startsWith("{") && json.endsWith("}")) {
+            payload = json.substring(1, json.length() - 1).trim();
+        }
+
+        // Split key-value pairs
+        String[] pairs = payload.split(",");
+
+        for (String pair : pairs) {
+            String[] keyValue = pair.split(":", 2);
+            if (keyValue.length == 2) {
+                String key = keyValue[0].trim().replaceAll("^\"|\"$", "");
+                String value = keyValue[1].trim().replaceAll("^\"|\"$", "");
+
+                if ("response".equals(key)) {
+                    return value;
+                }
+            }
+        }
+
+        return json;
     }
 
     public static String encrypt(String data, String publicKeyPath) throws Exception {
